@@ -5,6 +5,8 @@ import 'package:flutter_webapi_first_course/screens/home_screen/widgets/home_scr
 import '../../models/journal.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const routeName = "home";
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
