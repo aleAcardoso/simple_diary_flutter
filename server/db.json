@@ -1,0 +1,28 @@
+{
+  "journals": [
+    {
+      "id": "8fd33360-2e71-11ef-a10b-c703429c7448",
+      "content": "TEste testador\n",
+      "created_at": "2024-06-10 16:24:31.083841",
+      "updated_at": "2024-06-10 16:24:31.083841"
+    },
+    {
+      "id": "ae1182a0-2e71-11ef-8939-ff439bceff5e",
+      "content": "Teste testando",
+      "created_at": "2024-06-09 16:25:22.487553",
+      "updated_at": "2024-06-09 16:25:22.487553"
+    },
+    {
+      "id": "ad75e970-2e72-11ef-8237-0db1243d36b3",
+      "content": "Outro teste",
+      "created_at": "2024-06-11 16:32:32.202265",
+      "updated_at": "2024-06-11 16:32:32.202265"
+    },
+    {
+      "id": "4f5dcd10-2f19-11ef-b170-0351b452d047",
+      "content": "Mais um teste",
+      "created_at": "2024-06-12 11:32:01.211114",
+      "updated_at": "2024-06-12 11:32:01.211114"
+    }
+  ]
+}
