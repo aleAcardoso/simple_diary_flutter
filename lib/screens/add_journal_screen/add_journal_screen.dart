@@ -6,7 +6,8 @@ import 'package:flutter_webapi_first_course/services/journal_service.dart';
 class AddJournalScreen extends StatelessWidget {
   static const routeName = "add-journal";
   final Journal journal;
-  AddJournalScreen(this.journal, {super.key});
+  final bool isEditing;
+  AddJournalScreen(this.journal, this.isEditing, {super.key});
 
   final TextEditingController _contentController = TextEditingController();
 
@@ -46,8 +47,15 @@ class AddJournalScreen extends StatelessWidget {
   registerContent(BuildContext context) {
     journal.content = _contentController.text;
     JournalService service = JournalService();
-    service.registerJournal(journal).then((result) {
-      Navigator.pop(context, result);
-    });
+
+    if (isEditing) {
+      service.editJournal(journal.id, journal).then((result) {
+        Navigator.pop(context, result);
+      });
+    } else {
+      service.registerJournal(journal).then((result) {
+        Navigator.pop(context, result);
+      });
+    }
   }
 }
