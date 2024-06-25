@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webapi_first_course/helpers/weekday.dart';
 import 'package:flutter_webapi_first_course/models/journal.dart';
+import 'package:flutter_webapi_first_course/screens/commom/confirmation_dialog.dart';
+import 'package:flutter_webapi_first_course/services/journal_service.dart';
 import 'package:uuid/uuid.dart';
 
 class JournalCard extends StatelessWidget {
@@ -20,7 +22,7 @@ class JournalCard extends StatelessWidget {
     if (journal != null) {
       return InkWell(
         onTap: () {
-          callAddJournalScreen(context, journal!);
+          callAddJournalScreen(context, jour: journal);
         },
         child: Container(
           height: 115,
@@ -82,6 +84,12 @@ class JournalCard extends StatelessWidget {
                   ),
                 ),
               ),
+              IconButton(
+                onPressed: () {
+                  removeJournal(context);
+                },
+                icon: const Icon(Icons.delete),
+              ),
             ],
           ),
         ),
@@ -89,14 +97,7 @@ class JournalCard extends StatelessWidget {
     } else {
       return InkWell(
         onTap: () {
-          callAddJournalScreen(
-              context,
-              Journal(
-                id: const Uuid().v1(),
-                content: "",
-                createdAt: showedDate,
-                updatedAt: showedDate,
-              ));
+          callAddJournalScreen(context);
         },
         child: Container(
           height: 115,
@@ -111,8 +112,26 @@ class JournalCard extends StatelessWidget {
     }
   }
 
-  callAddJournalScreen(BuildContext context, Journal jour) {
-    Navigator.pushNamed(context, 'add-journal', arguments: jour).then((value) {
+  callAddJournalScreen(BuildContext context, {Journal? jour}) {
+    Journal innerJournal = Journal(
+      id: const Uuid().v1(),
+      content: "",
+      createdAt: showedDate,
+      updatedAt: showedDate,
+    );
+
+    Map<String, dynamic> map = {};
+
+    if (jour != null) {
+      innerJournal = jour;
+      map["is_editing"] = true;
+    } else {
+      map["is_editing"] = false;
+    }
+
+    map["journal"] = innerJournal;
+
+    Navigator.pushNamed(context, 'add-journal', arguments: map).then((value) {
       refreshFunction();
       if (value != null && value == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,5 +141,33 @@ class JournalCard extends StatelessWidget {
         );
       }
     });
+  }
+
+  removeJournal(BuildContext context) {
+    JournalService service = JournalService();
+
+    if (journal != null) {
+      showConfirmationDialog(
+        context,
+        content:
+            "Deseja realmente remover o diário do dia ${WeekDay(journal!.createdAt)}?",
+        affirmativeOption: "Remover",
+      ).then((value) {
+        if (value != null) {
+          if (value) {
+            service.deleteJournal(journal!.id).then((value) {
+              if (value) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Removido com sucesso!"),
+                  ),
+                );
+                refreshFunction();
+              }
+            });
+          }
+        }
+      });
+    }
   }
 }
