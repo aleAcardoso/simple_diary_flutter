@@ -1,5 +1,11 @@
 {
-  "users": [],
+  "users": [
+    {
+      "email": "aacds@msn.com",
+      "password": "$2a$10$99eYG2KupptFBebZI.Oixe.O05AB4WBfofuC3madMsGIRwGf8k1ky",
+      "id": 1
+    }
+  ],
   "journals": [
     {
       "id": "ae3f0660-33c3-11ef-8bbc-df3c456bdafe",
