@@ -1,3 +1,17 @@
 {
-  "journals": []
+  "users": [],
+  "journals": [
+    {
+      "id": "ae3f0660-33c3-11ef-8bbc-df3c456bdafe",
+      "content": "Teste testando",
+      "created_at": "2024-06-17 10:54:01.929227",
+      "updated_at": "2024-06-17 10:54:01.929227"
+    },
+    {
+      "id": "b2430270-33c3-11ef-8bbc-df3c456bdafe",
+      "content": "Mais um",
+      "created_at": "2024-06-18 10:54:01.929227",
+      "updated_at": "2024-06-18 10:54:01.929227"
+    }
+  ]
 }
