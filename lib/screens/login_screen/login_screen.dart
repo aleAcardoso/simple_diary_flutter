@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webapi_first_course/screens/commom/confirmation_dialog.dart';
+import 'package:flutter_webapi_first_course/screens/home_screen/home_screen.dart';
 import 'package:flutter_webapi_first_course/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -81,7 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
     String pass = _passController.text;
 
     try {
-      bool response = await service.login(email: email, password: pass);
+      await service.login(email: email, password: pass).then((resultLogin) {
+        if (resultLogin) {
+          navigateHome(context);
+        }
+      });
     } on UserNotFindException {
       showConfirmationDialog(
         context,
@@ -90,9 +95,17 @@ class _LoginScreenState extends State<LoginScreen> {
         affirmativeOption: "Criar",
       ).then((value){
         if (value != null && value) {
-          service.register(email: email, password: pass);
+          service.register(email: email, password: pass).then((resultRegister) {
+            if (resultRegister) {
+              navigateHome(context);
+            }
+          });
         }
       });
     }
+  }
+
+  navigateHome(BuildContext context) {
+    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
   }
 }
