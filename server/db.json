@@ -4,6 +4,11 @@
       "email": "aacds@msn.com",
       "password": "$2a$10$99eYG2KupptFBebZI.Oixe.O05AB4WBfofuC3madMsGIRwGf8k1ky",
       "id": 1
+    },
+    {
+      "email": "aaacds@msn.com",
+      "password": "$2a$10$iRHB9J4PQxGeE3JwC/mSDOfe6RMQH1zOmPn.AuWLcnO/fEeX2pUNa",
+      "id": 2
     }
   ],
   "journals": [
@@ -11,13 +16,22 @@
       "id": "ae3f0660-33c3-11ef-8bbc-df3c456bdafe",
       "content": "Teste testando",
       "created_at": "2024-06-17 10:54:01.929227",
-      "updated_at": "2024-06-17 10:54:01.929227"
+      "updated_at": "2024-06-17 10:54:01.929227",
+      "userId": 1
     },
     {
       "id": "b2430270-33c3-11ef-8bbc-df3c456bdafe",
-      "content": "Mais um",
+      "content": "Mais um, dois",
       "created_at": "2024-06-18 10:54:01.929227",
-      "updated_at": "2024-06-18 10:54:01.929227"
+      "updated_at": "2024-06-18 10:54:01.929227",
+      "userId": 2
+    },
+    {
+      "id": "146a20e0-33ed-11ef-a912-c39d96ad66ac",
+      "content": "Testeando",
+      "created_at": "2024-06-18 15:51:09.810968",
+      "updated_at": "2024-06-18 15:51:09.810968",
+      "userId": 2
     }
   ]
 }
