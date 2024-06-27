@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webapi_first_course/helpers/logout.dart';
 import 'package:flutter_webapi_first_course/helpers/weekday.dart';
 import 'package:flutter_webapi_first_course/models/journal.dart';
+import 'package:flutter_webapi_first_course/screens/commom/exception_dialog.dart';
 import 'package:flutter_webapi_first_course/screens/login_screen/login_screen.dart';
 import 'package:flutter_webapi_first_course/services/journal_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,20 +13,18 @@ class AddJournalScreen extends StatelessWidget {
   static const routeName = "add-journal";
   final Journal journal;
   final bool isEditing;
+
   AddJournalScreen(this.journal, this.isEditing, {super.key});
 
   final TextEditingController _contentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     _contentController.text = journal.content;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          WeekDay(journal.createdAt).toString()
-        ),
+        title: Text(WeekDay(journal.createdAt).toString()),
         actions: [
           IconButton(
             onPressed: () {
@@ -54,18 +56,41 @@ class AddJournalScreen extends StatelessWidget {
 
       if (token != null) {
         if (isEditing) {
-          service.editJournal(journal.id, journal, token).then((result) {
-            Navigator.pop(context, result);
-          });
+          service.editJournal(journal.id, journal, token).then(
+            (result) {
+              Navigator.pop(context, result);
+            },
+          ).catchError(
+            (error) {
+              logout(context);
+            },
+            test: (error) => error is TokenNotValidException,
+          ).catchError(
+            (error) {
+              showExceptionDialog(context, content: error.message);
+            },
+            test: (error) => error is HttpException,
+          );
         } else {
-          service.registerJournal(journal, token).then((result) {
-            Navigator.pop(context, result);
-          });
+          service.registerJournal(journal, token).then(
+            (result) {
+              Navigator.pop(context, result);
+            },
+          ).catchError(
+            (error) {
+              logout(context);
+            },
+            test: (error) => error is TokenNotValidException,
+          ).catchError(
+            (error) {
+              showExceptionDialog(context, content: error.message);
+            },
+            test: (error) => error is HttpException,
+          );
         }
       } else {
         Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       }
-
     });
   }
 }

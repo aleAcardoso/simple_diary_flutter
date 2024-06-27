@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webapi_first_course/screens/commom/confirmation_dialog.dart';
+import 'package:flutter_webapi_first_course/screens/commom/exception_dialog.dart';
 import 'package:flutter_webapi_first_course/screens/home_screen/home_screen.dart';
 import 'package:flutter_webapi_first_course/services/auth_service.dart';
 
@@ -81,28 +85,52 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = _emailController.text;
     String pass = _passController.text;
 
-    try {
-      await service.login(email: email, password: pass).then((resultLogin) {
+    await service.login(email: email, password: pass).then(
+      (resultLogin) {
         if (resultLogin) {
           navigateHome(context);
         }
-      });
-    } on UserNotFindException {
-      showConfirmationDialog(
-        context,
-        content:
-            "Deseja criar um novo usuário usando o e-mail $email e a senha inserida?",
-        affirmativeOption: "Criar",
-      ).then((value){
-        if (value != null && value) {
-          service.register(email: email, password: pass).then((resultRegister) {
-            if (resultRegister) {
-              navigateHome(context);
-            }
-          });
-        }
-      });
-    }
+      },
+    ).catchError(
+      (error) {
+        showExceptionDialog(context, content: error.message);
+      },
+      test: (error) => error is HttpException,
+    ).catchError(
+      (error) {
+        showConfirmationDialog(
+          context,
+          content:
+              "Deseja criar um novo usuário usando o e-mail $email e a senha inserida?",
+          affirmativeOption: "Criar",
+        ).then((value) {
+          if (value != null && value) {
+            service.register(email: email, password: pass).then(
+              (resultRegister) {
+                if (resultRegister) {
+                  navigateHome(context);
+                }
+              },
+            ).catchError(
+              (error) {
+                showExceptionDialog(context, content: error.message);
+              },
+              test: (error) => error is HttpException,
+            );
+          }
+        });
+      },
+      test: (error) => error is UserNotFindException,
+    ).catchError(
+      (error) {
+        showExceptionDialog(
+          context,
+          content:
+              "O servidor demorou para responder, tente novamente mais tarde!",
+        );
+      },
+      test: (error) => error is TimeoutException,
+    );
   }
 
   navigateHome(BuildContext context) {

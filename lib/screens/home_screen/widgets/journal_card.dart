@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webapi_first_course/helpers/logout.dart';
 import 'package:flutter_webapi_first_course/helpers/weekday.dart';
 import 'package:flutter_webapi_first_course/models/journal.dart';
 import 'package:flutter_webapi_first_course/screens/commom/confirmation_dialog.dart';
+import 'package:flutter_webapi_first_course/screens/commom/exception_dialog.dart';
 import 'package:flutter_webapi_first_course/services/journal_service.dart';
 import 'package:uuid/uuid.dart';
 
@@ -12,14 +16,14 @@ class JournalCard extends StatelessWidget {
   final int userId;
   final String token;
 
-  const JournalCard({
-    Key? key,
-    this.journal,
-    required this.showedDate,
-    required this.refreshFunction,
-    required this.userId,
-    required this.token
-  }) : super(key: key);
+  const JournalCard(
+      {Key? key,
+      this.journal,
+      required this.showedDate,
+      required this.refreshFunction,
+      required this.userId,
+      required this.token})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -118,12 +122,11 @@ class JournalCard extends StatelessWidget {
 
   callAddJournalScreen(BuildContext context, {Journal? jour}) {
     Journal innerJournal = Journal(
-      id: const Uuid().v1(),
-      content: "",
-      createdAt: showedDate,
-      updatedAt: showedDate,
-      userId: userId
-    );
+        id: const Uuid().v1(),
+        content: "",
+        createdAt: showedDate,
+        updatedAt: showedDate,
+        userId: userId);
 
     Map<String, dynamic> map = {};
 
@@ -160,16 +163,28 @@ class JournalCard extends StatelessWidget {
       ).then((value) {
         if (value != null) {
           if (value) {
-            service.deleteJournal(journal!.id, token).then((value) {
-              if (value) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Removido com sucesso!"),
-                  ),
-                );
-                refreshFunction();
-              }
-            });
+            service.deleteJournal(journal!.id, token).then(
+              (value) {
+                if (value) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Removido com sucesso!"),
+                    ),
+                  );
+                  refreshFunction();
+                }
+              },
+            ).catchError(
+              (error) {
+                logout(context);
+              },
+              test: (error) => error is TokenNotValidException,
+            ).catchError(
+              (error) {
+                showExceptionDialog(context, content: error.message);
+              },
+              test: (error) => error is HttpException,
+            );
           }
         }
       });
