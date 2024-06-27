@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webapi_first_course/helpers/logout.dart';
+import 'package:flutter_webapi_first_course/screens/commom/exception_dialog.dart';
 import 'package:flutter_webapi_first_course/screens/home_screen/widgets/home_screen_list.dart';
 import 'package:flutter_webapi_first_course/screens/login_screen/login_screen.dart';
 import 'package:flutter_webapi_first_course/services/journal_service.dart';
@@ -59,8 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           children: [
             ListTile(
-              onTap: (){
-                logout();
+              onTap: () {
+                logout(context);
               },
               title: const Text("Sair"),
               leading: const Icon(Icons.logout),
@@ -68,52 +72,59 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: (userId != null && userToken != null) ? ListView(
-        controller: _listScrollController,
-        children: generateListJournalCards(
-          windowPage: windowPage,
-          currentDay: currentDay,
-          database: database,
-          refreshFunction: refresh,
-          userId: userId!,
-          token: userToken!
-        ),
-      ) : const Center(
-        child: CircularProgressIndicator(),
-      ),
+      body: (userId != null && userToken != null)
+          ? ListView(
+              controller: _listScrollController,
+              children: generateListJournalCards(
+                  windowPage: windowPage,
+                  currentDay: currentDay,
+                  database: database,
+                  refreshFunction: refresh,
+                  userId: userId!,
+                  token: userToken!),
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 
   refresh() {
-    SharedPreferences.getInstance().then((prefs) {
-      String? token = prefs.getString("accessToken");
-      String? email = prefs.getString("email");
-      int? id = prefs.getInt("id");
+    SharedPreferences.getInstance().then(
+      (prefs) {
+        String? token = prefs.getString("accessToken");
+        String? email = prefs.getString("email");
+        int? id = prefs.getInt("id");
 
-      if (token != null && email != null && id != null) {
-        setState(() {
-          userId = id;
-          userToken = token;
-        });
-        journalService.getAll(id: id, token: token).then((items) {
+        if (token != null && email != null && id != null) {
           setState(() {
-            database = {};
-            for (var journal in items) {
-              database[journal.id] = journal;
-            }
+            userId = id;
+            userToken = token;
           });
-        });
-      } else {
-        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-      }
-
-    });
-  }
-
-  logout () {
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.clear();
-      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    });
+          journalService.getAll(id: id, token: token).then(
+            (items) {
+              setState(() {
+                database = {};
+                for (var journal in items) {
+                  database[journal.id] = journal;
+                }
+              });
+            },
+          ).catchError(
+            (error) {
+              logout(context);
+            },
+            test: (error) => error is TokenNotValidException,
+          ).catchError(
+            (error) {
+              showExceptionDialog(context, content: error.message);
+            },
+            test: (error) => error is HttpException,
+          );
+        } else {
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        }
+      },
+    );
   }
 }
